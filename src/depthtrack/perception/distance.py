@@ -5,11 +5,10 @@ Fuses two cues into a single per-object distance estimate:
 1. **Depth cue** - the median normalised depth inside the bounding box is mapped
    onto a metric near/far range.
 2. **Projection cue** - a pinhole-camera estimate from the apparent pixel width
-   of the object and an assumed real-world vehicle width.
+   of the object and the class-specific real-world vehicle width.
 
 The two are blended (controlled by ``DistanceConfig.depth_weight``) and clamped
-to a sane range. This mirrors the heuristic used in the original prototype but
-exposes every constant through configuration.
+to a sane range.
 """
 
 from __future__ import annotations
@@ -18,7 +17,6 @@ import numpy as np
 
 from ..config import DistanceConfig
 
-# A neutral fallback used when a box is degenerate (zero/negative area).
 _FALLBACK_DISTANCE_M = 50.0
 
 
@@ -28,6 +26,7 @@ def estimate_distance(
     frame_w: int,
     frame_h: int,
     cfg: DistanceConfig,
+    class_id: int = 2,
 ) -> float:
     """Estimate distance (metres) to the object in ``box``.
 
@@ -37,6 +36,8 @@ def estimate_distance(
         frame_w: Width of the frame the box is expressed in.
         frame_h: Height of the frame the box is expressed in.
         cfg: Distance estimator parameters.
+        class_id: COCO class id of the detected object. Used to look up the
+            correct real-world width so trucks/buses are not confused with cars.
 
     Returns:
         Distance in metres, rounded to one decimal place.
@@ -53,8 +54,9 @@ def estimate_distance(
     depth_span = cfg.depth_far_m - cfg.depth_near_m
     dist_from_depth = cfg.depth_near_m + median_depth * depth_span
 
+    real_width = cfg.width_for_class(class_id)
     pixel_width = max(x2 - x1, 1)
-    dist_from_projection = (cfg.focal_length_px * cfg.real_vehicle_width_m) / pixel_width
+    dist_from_projection = (cfg.focal_length_px * real_width) / pixel_width
 
     w = cfg.depth_weight
     fused = w * dist_from_depth + (1.0 - w) * dist_from_projection

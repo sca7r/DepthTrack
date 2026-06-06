@@ -54,18 +54,33 @@ class DistanceConfig:
     """Parameters for the depth + pinhole-projection distance estimator."""
 
     focal_length_px: float = 700.0
-    real_vehicle_width_m: float = 2.0
+    real_vehicle_width_m: float = 2.0  # fallback for unknown classes
+    # Per-class real-world widths (metres). Keys are COCO class IDs.
+    # A truck/bus is ~2.5m wide; a car ~1.8m; motorcycle/bicycle much narrower.
+    vehicle_widths_m: dict[int, float] = field(default_factory=lambda: {
+        1: 0.6,   # bicycle
+        2: 1.8,   # car
+        3: 0.8,   # motorcycle
+        5: 2.5,   # bus
+        7: 2.5,   # truck
+    })
     depth_near_m: float = 1.0
     depth_far_m: float = 80.0
     depth_weight: float = 0.5  # blend between depth-based and projection-based estimate
     min_distance_m: float = 1.0
     max_distance_m: float = 100.0
 
+    def width_for_class(self, class_id: int) -> float:
+        """Return the real-world width (m) for a given COCO class id."""
+        return self.vehicle_widths_m.get(class_id, self.real_vehicle_width_m)
+
     def __post_init__(self) -> None:
         if not 0.0 <= self.depth_weight <= 1.0:
             raise ValueError("depth_weight must be in [0, 1]")
         if self.min_distance_m >= self.max_distance_m:
             raise ValueError("min_distance_m must be < max_distance_m")
+        # Normalise YAML string keys to int
+        self.vehicle_widths_m = {int(k): float(v) for k, v in self.vehicle_widths_m.items()}
 
 
 @dataclass

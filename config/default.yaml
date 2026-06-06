@@ -3,7 +3,7 @@
 # then pass with:  depthtrack input.mp4 --config config/default.yaml
 
 model:
-  detector_weights: yolov8n.pt          # YOLO weights
+  detector_weights: yolov8n.pt          # YOLO weights (resolved against --assets-dir)
   depth_model: depth-anything/Depth-Anything-V2-Small-hf
   confidence: 0.35                       # detection confidence threshold (0, 1]
   device: cpu                            # cpu | cuda
@@ -17,7 +17,13 @@ model:
 
 distance:
   focal_length_px: 700.0                 # assumed camera focal length (pixels)
-  real_vehicle_width_m: 2.0              # assumed real-world vehicle width (m)
+  real_vehicle_width_m: 2.0              # fallback width for unknown classes (m)
+  vehicle_widths_m:                      # per-class real-world widths (COCO id -> metres)
+    1: 0.6                               # bicycle
+    2: 1.8                               # car
+    3: 0.8                               # motorcycle
+    5: 2.5                               # bus
+    7: 2.5                               # truck
   depth_near_m: 1.0                      # metric distance mapped to depth=0
   depth_far_m: 80.0                      # metric distance mapped to depth=1
   depth_weight: 0.5                      # blend: depth cue vs projection cue [0, 1]
