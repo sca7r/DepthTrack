@@ -79,7 +79,7 @@ class Renderer:
                     (255, 255, 0), 1, cv2.LINE_AA, tipLength=0.4,
                 )
 
-        cv2.putText(out, "DASHCAM \u00b7 ADAS PERCEPTION", (10, 22),
+        cv2.putText(out, "DASHCAM | ADAS PERCEPTION", (10, 22),
                     _FONT, 0.55, (0, 255, 80), 1, cv2.LINE_AA)
         return out
 
@@ -115,7 +115,7 @@ class Renderer:
                     color, self.panel_w, self.panel_h,
                 )
 
-        cv2.putText(canvas, "3D BEV \u00b7 DEPTH PERCEPTION", (10, 22),
+        cv2.putText(canvas, "3D BEV | DEPTH PERCEPTION", (10, 22),
                     _FONT, 0.55, (0, 220, 255), 1, cv2.LINE_AA)
         return canvas
 
