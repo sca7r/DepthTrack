@@ -9,7 +9,7 @@ description = "DepthTrack: YOLO detection, Depth Anything V2, BEV, and collision
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "Tuba Khan" }]
+authors = [{ name = "Harsh Patil" }]
 keywords = ["computer-vision", "adas", "depth-estimation", "object-detection", "dashcam", "autonomous-driving"]
 classifiers = [
     "Programming Language :: Python :: 3",
