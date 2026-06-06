@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-06-06
+
+### Fixed
+- **Inverted depth cue (major accuracy bug).** Depth Anything V2 outputs
+  *inverse* depth (high value = near), but the distance estimator treated a
+  high value as far. This inverted every estimate: vehicles directly ahead
+  were reported as distant/`SAFE` while far-off vehicles read as close. The
+  depth term in `estimate_distance()` is now correctly inverted so high depth
+  maps to a short distance.
+- BEV rendering was inverted to match: the point cloud and 3D object boxes now
+  place near objects at the bottom of the view (where the perspective grid is
+  widest) and far objects toward the horizon, with near objects drawn larger.
+
 ## [1.2.1] - 2026-06-06
 
 ### Fixed

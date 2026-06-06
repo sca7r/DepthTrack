@@ -49,7 +49,9 @@ def project_pointcloud(
 
     d = depth_norm[yy, xx].astype(np.float32)
     u = xx.astype(np.float32) / w
-    bev_y = (ch * _HORIZON_FRAC + (1.0 - d) * ch * _DEPTH_FRAC).astype(np.int32)
+    # d is inverse depth (high = near). The grid widens toward the bottom, so
+    # near points belong at the bottom (large y) and far points near the horizon.
+    bev_y = (ch * _HORIZON_FRAC + d * ch * _DEPTH_FRAC).astype(np.int32)
     spread = 0.38 + 0.52 * d
     bev_x = (cw * 0.5 + (u - 0.5) * cw * spread).astype(np.int32)
 
@@ -67,11 +69,13 @@ def draw_bev_box(
     height: int,
 ) -> None:
     """Draw a glowing pseudo-3D box for one object at its BEV position."""
-    d_norm = float(np.clip(1.0 - dist_m / BEV_Z_FAR_M, 0.0, 1.0))
-    bev_y = int(height * _HORIZON_FRAC + (1.0 - d_norm) * height * _DEPTH_FRAC)
-    spread = 0.38 + 0.52 * d_norm
+    # Proximity: 1.0 = at the camera, 0.0 = at/beyond the far plane.
+    prox = float(np.clip(1.0 - dist_m / BEV_Z_FAR_M, 0.0, 1.0))
+    # Near objects sit at the bottom (large y); far objects near the horizon.
+    bev_y = int(height * _HORIZON_FRAC + prox * height * _DEPTH_FRAC)
+    spread = 0.38 + 0.52 * prox
     bev_x = int(width * 0.5 + (cx_norm - 0.5) * width * spread)
-    scale = 0.5 + 1.5 * (1.0 - d_norm)
+    scale = 0.5 + 1.5 * prox
 
     bw, bh, bd = int(55 * scale), int(35 * scale), int(20 * scale)
     fl, fr = bev_x - bw // 2, bev_x + bw // 2

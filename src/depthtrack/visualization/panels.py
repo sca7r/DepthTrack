@@ -54,7 +54,7 @@ class Renderer:
                 cls = int(tracked.class_id[i]) if tracked.class_id is not None else 2
                 tid = int(tracked.tracker_id[i]) if tracked.tracker_id is not None else 0
                 label = self.cfg.model.vehicle_classes.get(cls, "vehicle")
-                dist = estimate_distance(depth_map, box, w, h, self.cfg.distance)
+                dist = estimate_distance(depth_map, box, w, h, self.cfg.distance, cls)
                 risk = classify_risk(dist, box, w, self.cfg.risk)
                 color = RISK_COLORS[risk]
 
@@ -106,7 +106,7 @@ class Renderer:
                 box = tracked.xyxy[i]
                 cls = int(tracked.class_id[i]) if tracked.class_id is not None else 2
                 name = self.cfg.model.vehicle_classes.get(cls, "vehicle")
-                dist = estimate_distance(d_full, box, frame_w, frame_h, self.cfg.distance)
+                dist = estimate_distance(d_full, box, frame_w, frame_h, self.cfg.distance, cls)
                 risk = classify_risk(dist, box, frame_w, self.cfg.risk)
                 color = RISK_COLORS[risk]
                 cx_norm = ((box[0] + box[2]) / 2) / frame_w

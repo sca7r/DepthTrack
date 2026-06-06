@@ -51,8 +51,10 @@ def estimate_distance(
     patch = depth_map[y1:y2, x1:x2]
     median_depth = float(np.median(patch))
 
+    # Depth Anything V2 outputs INVERSE depth: high normalised value = NEAR,
+    # low value = FAR. So a high median maps to a SHORT distance.
     depth_span = cfg.depth_far_m - cfg.depth_near_m
-    dist_from_depth = cfg.depth_near_m + median_depth * depth_span
+    dist_from_depth = cfg.depth_near_m + (1.0 - median_depth) * depth_span
 
     real_width = cfg.width_for_class(class_id)
     pixel_width = max(x2 - x1, 1)
