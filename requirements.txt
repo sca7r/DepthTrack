@@ -2,7 +2,7 @@
 # For GPU support, install the CUDA build of torch/torchvision from
 # https://pytorch.org/get-started/locally/ instead of the default wheels.
 
-numpy==1.24.4
+numpy>=1.26.0
 Pillow>=10.0
 PyYAML>=6.0
 tqdm>=4.65
